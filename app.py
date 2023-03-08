@@ -16,7 +16,6 @@ auth_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secr
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
 st.set_page_config(layout="wide")
-st.write(px)
 @st.cache_data
 def load_data():
     data = pd.read_csv('tracks_clustered.csv')
@@ -162,7 +161,7 @@ with tab2:
 styl = f"""
 <style>
   .block-container {{
-    background-image: url("{pic_3}");
+    background-image: url("{pic_2}");
     background-size: cover;
     height: 98vh;
   }}
@@ -181,11 +180,11 @@ styl = f"""
     background-color: #fff;
   }}
   div.stButton > button:first-child {{
-    background-color: #5E35B1;
+    background-color: #1976D2;
     color:#ffffff;
   }}
   div.stButton > button:hover {{
-    background-color: #9575CD;
+    background-color: #90CAF9;
     color:#fff;
   }}
   div[data-baseweb="notification"] {{
