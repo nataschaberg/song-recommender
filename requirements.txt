@@ -1,0 +1,5 @@
+streamlit==1.18.1
+pandas==1.4.4
+plotly-express==0.4.1
+spotipy==2.22.1
+scikit-learn==1.0.2
