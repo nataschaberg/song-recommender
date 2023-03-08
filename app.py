@@ -4,6 +4,7 @@ import plotly.express as px
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import pairwise_distances_argmin_min
+import random
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -23,6 +24,11 @@ def load_data():
     return data 
 
 @st.cache_data
+def load_top_100_data():
+    data = pd.read_csv('billboard_100.csv')
+    return data 
+
+@st.cache_data
 def apply_PCA(X, tracks, dim):
     pca = PCA(dim)
     sc = StandardScaler()
@@ -39,11 +45,14 @@ def apply_PCA(X, tracks, dim):
 
 def get_trackid_by_search_query(searchquery):
     res = sp.search(searchquery)
-    id = res['tracks']['items'][0]['id'] 
-    song = res['tracks']['items'][0]['name']
-    artists = ', '.join([a['name'] for a in res['tracks']['items'][0]['artists']])
 
-    return id, song, artists
+    if len(res['tracks']['items']) > 0:
+      id = res['tracks']['items'][0]['id'] 
+      song = res['tracks']['items'][0]['name']
+      artists = ', '.join([a['name'] for a in res['tracks']['items'][0]['artists']])
+      return id, song, artists
+    else:
+       return '', '', ''
 
 def get_audio_features(track_id):
    res = sp.audio_features([track_id])
@@ -75,6 +84,7 @@ def get_top_recommendation(id):
       return song, artists
 
 data = load_data()
+top_100 = load_top_100_data()
 data_PCA = apply_PCA(data[AUDIO_FEATURES], data, 3)
 pic_1 = 'https://images.pexels.com/photos/1037999/pexels-photo-1037999.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
 pic_2 = 'https://t3.ftcdn.net/jpg/04/14/62/04/360_F_414620426_iam5N6Bhp8YMOEOJD7MqdI1dC0Tw0CIY.jpg'
@@ -89,12 +99,32 @@ col1.text('Recommender')
 col1.text('Explorer')
 col1.text('Suggester')
 
+def get_top100_recommendation(search_query):
+   art, sg = search_query.split('-')
+   entry = top_100.query('(song_title.str.lower() == @sg.strip().lower()) and (artist.str.lower() == @art.strip().lower())')
+   if entry.shape[0] == 1:
+      rec = top_100.query('song_title.str.lower() != @sg.strip().lower()').iloc[random.randint(1, top_100.shape[0] - 1)]
+      return rec['artist'], rec['song_title']
+   else:
+      return '', ''
+
 search_query = col2.text_input('', 'artist - song')
 if col2.button('Reccomend Song'):
-   #artist, song = search_query.split('-')
-   id, song, artists = get_trackid_by_search_query(f'q={search_query}&type=track')
-   s, a = get_top_recommendation(id) 
-   col2.markdown(f'<div id="recommendation-box">🎵 Your Song:<br/> <b>{song}  --  {artists}</b><br/><br/>  🎱 Recommendation: <br/><strong>{s}  --  {a}</strong></div>', unsafe_allow_html=True)
+   if '-' not in search_query:
+      col2.error('Please enter in right format: <artist> - <song>')
+   else:
+      artists, song = search_query.split('-')
+      s, a = get_top100_recommendation(search_query)
+      if not s:
+          id, song, artists = get_trackid_by_search_query(f'q={search_query}&type=track')
+          if id:
+             s, a = get_top_recommendation(id)
+             col2.markdown(f'<div id="recommendation-box">🎵 Your Song:<br/> <b>{song}  --  {artists}</b><br/><br/>  🎱 Recommendation: <br/><strong>{s}  --  {a}</strong></div>', unsafe_allow_html=True)
+          else:
+             col2.warning('Nothing found for your entry - please check your input') 
+      else:
+         col2.markdown(f'<div id="recommendation-box">🎵 Your Song:<br/> <b>{song}  --  {artists}</b><br/><br/>  🎱 Recommendation: <br/><strong>{s}  --  {a}</strong></div>', unsafe_allow_html=True)
+      
 
 
 
@@ -148,7 +178,7 @@ with tab1:
   fig_2.update_layout(height=800)
   col_d.plotly_chart(fig_2, use_container_width=True, height=800)
 
-  st.subheader('Raw Data')
+  st.subheader('Spotify Tracks Collected Data')
   st.write(data.loc[0:100, :])
 
   
