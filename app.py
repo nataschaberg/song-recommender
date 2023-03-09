@@ -31,6 +31,22 @@ bg_setup = f"""
     background-position: center;
     height: 98vh;
   }}
+  div.block-container:nth-child(1)  div[data-testid="stHorizontalBlock"] {{
+    height: 85vh;
+  }}
+  div.stButton > button:first-child {{
+    background-color: #90CAF9;
+    color:#ffffff;
+  }}
+  div.stButton > button:hover {{
+    background-color: #E57373;
+    color:#fff;
+  }}
+  div.stButton > button:focus:not(:active) {{
+    background-color: #E57373;
+    color: #fff;
+    border:none;
+  }}
 </style>
 """
 
@@ -157,13 +173,15 @@ data_PCA = apply_PCA(data[AUDIO_FEATURES], data, 3)
    
 col1, col2, col3= st.columns([2, 3, 2])
 
-col2.markdown('<br/><br/><br/><br/><br/><br/>', unsafe_allow_html=True)
-col1.markdown('<span style="color:#EF9A9A;font-size:28px;font-weight:700;">EXPLORING NEW SOUNDS</span>', unsafe_allow_html=True)
+
+
+col1.markdown('<span class="hide-mobile" style="color:#EF9A9A;font-size:28px;font-weight:700;">EXPLORING NEW SOUNDS</span>', unsafe_allow_html=True)
 col1.title('MUS.IIC')
 col1.text('Recommender')
 col1.text('Explorer')
 col1.text('Suggester')
 
+col2.markdown('<div class="hide-mobile"><br/><br/><br/><br/><br/><br/><br/><br/><br/></div>', unsafe_allow_html=True)
 search_query = col2.text_input('', placeholder='Enter a song you enjoy like: Linkin Park - Numb')
 if col2.button('GET SONG!'):
    handle_search_query(search_query, col2)
@@ -177,12 +195,16 @@ tab1, tab2 = st.tabs(["Explore Dataset", "Song Clustering"])
 
 with tab1:
   ### section 0 ###
+  st.write(' ')
+  st.write(' ')
   st.subheader('Details on Dataset')
   st.markdown(f'Dataset was created by collecting song information from Spotify. It comprises {data.shape[0]:,.0f} tracks with \
               information on song name, artists, audio features, playlist with which the song was assosiated with during collection, \
               the category of the playlist and some more. Go to the **Raw Data** section below to have a look.') 
   
   ### section 1 ###
+  st.write(' ')
+  st.write(' ')
   st.subheader('Song categories')
   st.markdown(f'Visually explore songs by category - Based on PCA applied to only audio features of songs.')
   col_a, col_b = st.columns([1, 3])
@@ -212,6 +234,8 @@ with tab1:
 
 with tab2:
   ### section 0 ###
+  st.write(' ')
+  st.write(' ')
   st.subheader('Song Clustering Project')
   st.markdown(f'For the song recommender the collected songs from dataset were clustered with KMeans algorithm. For the clustering only audio features \
                were considered. See number of cluster development in the last section. <br/> Note that for the recommendation of songs in this app there \
@@ -240,9 +264,6 @@ with tab2:
 
 styl = f"""
 <style>
-  div[data-testid="stImage"] > img {{
-    border-radius: 15px;
-  }}
   div[data-baseweb="tab-list"] p {{
     font-size: 20px;
     font-weight: 600;
@@ -254,35 +275,25 @@ styl = f"""
   div[data-baseweb="tab-list"] button:focus {{
     background-color: #fff;
   }}
-  div.stButton > button:first-child {{
-    background-color: #90CAF9;
-    color:#ffffff;
-  }}
-  div.stButton > button:hover {{
-    background-color: #E57373;
-    color:#fff;
-  }}
-  div.stButton > button:focus:not(:active) {{
-    background-color: #E57373;
-    color: #fff;
-    border:none;
-  }}
   div[data-baseweb="notification"] {{
     background-color: white;
     font-color: #000;
-  }}
-  div.block-container:nth-child(1)  div[data-testid="stHorizontalBlock"] {{
-    height: 80vh;
   }}
   div#recommendation-box {{
     background-color: #fff;
     padding: 12px;
     border-radius: 8px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
   }}
-  span#custom-close >> button {{
-    position:absolute !important;
-    top:0;
-    right:0;
+  @media (min-width: 450px) {{
+    .hide-mobile {{
+      display: block;
+    }}
+  }}
+  @media (max-width: 450px) {{
+    .hide-mobile {{
+      display: none;
+    }}
   }}
   footer {{visibility: hidden;}}
 </style>
