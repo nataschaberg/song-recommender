@@ -255,6 +255,8 @@ with tab2:
 
   ### section 2 ###
   st.subheader('Model Performance - Cluster Development')
+  st.markdown('- The dotted line below indicates the optimal number of clusters fitted on the whole collected dataset')
+  st.write(' ')
   st.image('https://raw.githubusercontent.com/nataschaberg/song-recommender/master/k_clusters_kmeans_elbow.png', width=600)
 
 
